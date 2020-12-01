@@ -1,4 +1,6 @@
 from sklearn.impute import KNNImputer
+# from sklearn import impute
+import matplotlib.pyplot as plt
 from utils import *
 
 
@@ -19,7 +21,7 @@ def knn_impute_by_user(matrix, valid_data, k):
     # We use NaN-Euclidean distance measure.
     mat = nbrs.fit_transform(matrix)
     acc = sparse_matrix_evaluate(valid_data, mat)
-    print("Validation Accuracy: {}".format(acc))
+    print("user Validation Accuracy: {}".format(acc))
     return acc
 
 
@@ -37,7 +39,11 @@ def knn_impute_by_item(matrix, valid_data, k):
     # TODO:                                                             #
     # Implement the function as described in the docstring.             #
     #####################################################################
-    acc = None
+    nbrs = KNNImputer(n_neighbors=k)
+    # We use NaN-Euclidean distance measure.
+    mat = nbrs.fit_transform(matrix.T)
+    acc = sparse_matrix_item_evaluate(valid_data, mat)
+    print("item Validation Accuracy: {}".format(acc))
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -60,7 +66,58 @@ def main():
     # the best performance and report the test accuracy with the        #
     # chosen k*.                                                        #
     #####################################################################
-    pass
+    ks = [1, 6,  11, 16, 21, 26]
+    best_k = 0
+    best_acc = 0
+
+    validation_accs = []
+    for k in ks:
+        print("for k = ", k)
+        acc = knn_impute_by_user(sparse_matrix, val_data, k)
+
+        validation_accs.append(acc)
+        if acc > best_acc:
+            best_acc = acc
+            best_k = k
+
+    print("User collaboration's k with best accuracy is: ", best_k)
+
+    #   calculating the accuracy of test data with the best k value
+    test_acc = knn_impute_by_user(sparse_matrix, test_data, best_k)
+    print("User collaboration's final test accuracy is: ", test_acc)
+    #   Plotting KNN
+    plt.title("Accuracies of  Validation on ks for user collaboration")
+    plt.plot(ks, validation_accs, label="Validation")
+    plt.xlabel("k-Nearest Neighbours")
+    plt.ylabel("Accuracy")
+    plt.legend(loc='best')
+    plt.show()
+
+    best_k = 0
+    best_acc = 0
+
+    validation_accs = []
+    for k in ks:
+        print("for k = ", k)
+        acc = knn_impute_by_item(sparse_matrix, val_data, k)
+
+        validation_accs.append(acc)
+        if acc > best_acc:
+            best_acc = acc
+            best_k = k
+
+    print("item collaboration's k with best accuracy is: ", best_k)
+
+    #   calculating the accuracy of test data with the best k value
+    test_acc = knn_impute_by_item(sparse_matrix, test_data, best_k)
+    print("item collaboration's final test accuracy is: ", test_acc)
+    #   Plotting KNN
+    plt.title("Accuracies of  Validation on ks for item collaboration")
+    plt.plot(ks, validation_accs, label="Validation")
+    plt.xlabel("k-Nearest Neighbours")
+    plt.ylabel("Accuracy")
+    plt.legend(loc='best')
+    plt.show()
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
