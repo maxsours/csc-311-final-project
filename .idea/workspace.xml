@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5c295ba1-302e-4b6c-8932-fc1258e33d60" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/part_a/knn.py" beforeDir="false" afterPath="$PROJECT_DIR$/part_a/knn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +33,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/OneDrive/Desktop/uni/csc420/A4/A4Q3" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager">
@@ -93,7 +93,9 @@
       <option name="presentableId" value="Default" />
       <updated>1606600164707</updated>
       <workItem from="1606600167040" duration="4300000" />
-      <workItem from="1606616391350" duration="9914000" />
+      <workItem from="1606616391350" duration="11051000" />
+      <workItem from="1606678652749" duration="1612000" />
+      <workItem from="1606841017472" duration="4838000" />
     </task>
     <servers />
   </component>
@@ -101,6 +103,10 @@
     <option name="version" value="3" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="342" y="274" key="FileChooserDialogImpl" timestamp="1606630117071">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="342" y="274" key="FileChooserDialogImpl/0.0.1920.1040/-1920.-160.1920.1040@0.0.1920.1040" timestamp="1606630117071" />
     <state x="461" y="164" key="SettingsEditor" timestamp="1606611047356">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

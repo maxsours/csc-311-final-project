@@ -72,6 +72,7 @@ def main():
 
     validation_accs = []
     for k in ks:
+        print("for k = ", k)
         acc = knn_impute_by_user(sparse_matrix, val_data, k)
 
         validation_accs.append(acc)
@@ -85,7 +86,7 @@ def main():
     test_acc = knn_impute_by_user(sparse_matrix, test_data, best_k)
     print("User collaboration's final test accuracy is: ", test_acc)
     #   Plotting KNN
-    plt.title("Accuracies of  Validation on ks")
+    plt.title("Accuracies of  Validation on ks for user collaboration")
     plt.plot(ks, validation_accs, label="Validation")
     plt.xlabel("k-Nearest Neighbours")
     plt.ylabel("Accuracy")
@@ -97,6 +98,7 @@ def main():
 
     validation_accs = []
     for k in ks:
+        print("for k = ", k)
         acc = knn_impute_by_item(sparse_matrix, val_data, k)
 
         validation_accs.append(acc)
@@ -110,7 +112,7 @@ def main():
     test_acc = knn_impute_by_item(sparse_matrix, test_data, best_k)
     print("item collaboration's final test accuracy is: ", test_acc)
     #   Plotting KNN
-    plt.title("Accuracies of  Validation on ks")
+    plt.title("Accuracies of  Validation on ks for item collaboration")
     plt.plot(ks, validation_accs, label="Validation")
     plt.xlabel("k-Nearest Neighbours")
     plt.ylabel("Accuracy")
