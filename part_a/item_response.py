@@ -1,7 +1,7 @@
 from utils import *
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def sigmoid(x):
     """ Apply sigmoid function.
@@ -24,11 +24,15 @@ def neg_log_likelihood(data, theta, beta):
     # TODO:                                                             #
     # Implement the function as described in the docstring.             #
     #####################################################################
-    log_lklihood = 0.
+    user_id = data["user_id"]
+    question_id = data["question_id"]
+    is_correct = data["is_correct"]
+    neg_log_p_cij = lambda i: np.logaddexp(0, beta[question_id[i]] - theta[user_id[i]]) if is_correct[i] else np.logaddexp(0, theta[user_id[i]] - beta[question_id[i]])
+    log_lklihood = np.sum([neg_log_p_cij(i) for i in range(len(is_correct))])
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
-    return -log_lklihood
+    return log_lklihood
 
 
 def update_theta_beta(data, lr, theta, beta):
@@ -52,7 +56,20 @@ def update_theta_beta(data, lr, theta, beta):
     # TODO:                                                             #
     # Implement the function as described in the docstring.             #
     #####################################################################
-    pass
+    user_id = data["user_id"]
+    question_id = data["question_id"]
+    is_correct = data["is_correct"]
+    grad_theta = 0 * theta
+    
+    for i in range(len(is_correct)):
+        grad_theta[user_id[i]] += is_correct[i] - sigmoid(theta[user_id[i]] - beta[question_id[i]])
+    grad_theta /= len(theta)
+    # Trying to maximize, not minimize
+    theta += lr * grad_theta
+    grad_beta = 0 * beta
+    for i in range(len(is_correct)):
+        grad_beta[question_id[i]] -= is_correct[i] - sigmoid(theta[user_id[i]] - beta[question_id[i]])
+    beta += lr * grad_beta
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -73,8 +90,8 @@ def irt(data, val_data, lr, iterations):
     :return: (theta, beta, val_acc_lst)
     """
     # TODO: Initialize theta and beta.
-    theta = None
-    beta = None
+    theta = np.random.rand(542)
+    beta = np.random.rand(1774)
 
     val_acc_lst = []
 
@@ -82,7 +99,7 @@ def irt(data, val_data, lr, iterations):
         neg_lld = neg_log_likelihood(data, theta=theta, beta=beta)
         score = evaluate(data=val_data, theta=theta, beta=beta)
         val_acc_lst.append(score)
-        print("NLLK: {} \t Score: {}".format(neg_lld, score))
+        #print("NLLK: {} \t Score: {}".format(neg_lld, score))
         theta, beta = update_theta_beta(data, lr, theta, beta)
 
     # TODO: You may change the return values to achieve what you want.
@@ -120,7 +137,8 @@ def main():
     # Tune learning rate and number of iterations. With the implemented #
     # code, report the validation and test accuracy.                    #
     #####################################################################
-    pass
+    theta, beta, val_acc_list = irt(train_data, val_data, 0.1, 300)
+    plt.plot(range(len(val_acc_list)), val_acc_list)
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
