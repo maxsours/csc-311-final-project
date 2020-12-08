@@ -1,13 +1,18 @@
+import sys
+sys.path.append('../')
+
 from utils import *
+import torch
 from torch.autograd import Variable
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data
 
 import numpy as np
-import torch
+import matplotlib.pyplot as plt
 
 
 def load_data(base_path="../data"):
@@ -65,12 +70,14 @@ class AutoEncoder(nn.Module):
         :param inputs: user vector.
         :return: user vector.
         """
-        #####################################################################
-        # TODO:                                                             #
+        #####################################################################                                                           #
         # Implement the function as described in the docstring.             #
         # Use sigmoid activations for f and g.                              #
         #####################################################################
-        out = inputs
+        out = self.g(inputs)
+        out = F.sigmoid(out)
+        out = self.h(out)
+        out = F.sigmoid(out)
         #####################################################################
         #                       END OF YOUR CODE                            #
         #####################################################################
@@ -90,7 +97,8 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
     :param num_epoch: int
     :return: None
     """
-    # TODO: Add a regularizer to the cost function. 
+    # E)
+    # TODO: Add a regularizer to the cost function.  
     
     # Tell PyTorch you are training the model.
     model.train()
@@ -99,6 +107,11 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
     optimizer = optim.SGD(model.parameters(), lr=lr)
     num_student = train_data.shape[0]
 
+    cost = []
+    accValid = []
+    accTrain = []
+
+
     for epoch in range(0, num_epoch):
         train_loss = 0.
 
@@ -106,22 +119,37 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
             inputs = Variable(zero_train_data[user_id]).unsqueeze(0)
             target = inputs.clone()
 
+            # FORWARD PASS
             optimizer.zero_grad()
             output = model(inputs)
+
+            # print(model.layers[0].shape)
+            # print(model.layers[1].shape)
 
             # Mask the target to only compute the gradient of valid entries.
             nan_mask = np.isnan(train_data[user_id].unsqueeze(0).numpy())
             target[0][nan_mask] = output[0][nan_mask]
-
+            
+            # BACKWARD PASS
             loss = torch.sum((output - target) ** 2.)
             loss.backward()
 
             train_loss += loss.item()
             optimizer.step()
 
+        reg = lamb/2 *model.get_weight_norm()
+        train_loss += reg
+
         valid_acc = evaluate(model, zero_train_data, valid_data)
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
               "Valid Acc: {}".format(epoch, train_loss, valid_acc))
+        # train_acc = evaluate(model, zero_train_data, train_data)
+
+        cost.append(train_loss)
+        accValid.append(valid_acc)
+        # accTrain.append(train_acc)
+
+    return cost, accValid
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -162,16 +190,39 @@ def main():
     # validation set.                                                   #
     #####################################################################
     # Set model hyperparameters.
-    k = None
-    model = None
 
+    questions_num = train_matrix.shape[1]
+
+    i = 1
+    lamb_index = 0
+
+    k = [10, 50, 100, 200, 500]
+    
     # Set optimization hyperparameters.
-    lr = None
-    num_epoch = None
-    lamb = None
+    lr = [0.05, 0.05, 0.05, 0.05, 0.08]
+    num_epoch = [10, 8, 8, 7, 6]
+    lamb = [0, 0.001, 0.01, 0.1, 1]
+    # for i in range(len(k)):
+    model = AutoEncoder(questions_num, k[i])
+    res = train(model, lr[i], lamb[lamb_index], train_matrix, zero_train_matrix,
+          valid_data, num_epoch[i])
 
-    train(model, lr, lamb, train_matrix, zero_train_matrix,
-          valid_data, num_epoch)
+    test_acc = evaluate(model, zero_train_matrix, test_data)
+    print("Test Accuracy:", test_acc)
+
+    epochs = np.arange(num_epoch[i])
+
+    fig, ax = plt.subplots(1, 2)
+    ax[0].plot(epochs, res[0])  
+    ax[0].set_xlabel("Epoch")  
+    ax[0].set_ylabel("Acc")  
+    ax[0].set_title("Training Loss per Epoch")
+    ax[1].set_xlabel("Epoch")  
+    ax[1].set_ylabel("Loss")  
+    ax[1].set_title("Validation Accuracy per Epoch")
+    ax[1].plot(epochs, res[1])
+    plt.show()
+
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
