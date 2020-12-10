@@ -94,16 +94,19 @@ def irt(data, val_data, lr, iterations):
     beta = np.random.rand(1774)
 
     val_acc_lst = []
+    train_acc_lst = []
 
     for i in range(iterations):
         neg_lld = neg_log_likelihood(data, theta=theta, beta=beta)
         score = evaluate(data=val_data, theta=theta, beta=beta)
+        tscore = evaluate(data=data, theta=theta, beta=beta)
         val_acc_lst.append(score)
+        train_acc_lst.append(tscore)
         #print("NLLK: {} \t Score: {}".format(neg_lld, score))
         theta, beta = update_theta_beta(data, lr, theta, beta)
 
-    # TODO: You may change the return values to achieve what you want.
-    return theta, beta, val_acc_lst
+    # Added list of training accuracies
+    return theta, beta, val_acc_lst, train_acc_lst
 
 
 def evaluate(data, theta, beta):
@@ -137,8 +140,14 @@ def main():
     # Tune learning rate and number of iterations. With the implemented #
     # code, report the validation and test accuracy.                    #
     #####################################################################
-    theta, beta, val_acc_list = irt(train_data, val_data, 0.1, 300)
-    plt.plot(range(len(val_acc_list)), val_acc_list)
+    theta, beta, val_acc_list, train_acc_list = irt(train_data, val_data, 0.15, 300)
+    plt.plot(val_acc_list, label = "Validation Accuracy")
+    plt.plot(train_acc_list, label = "Training Accuracy")
+    plt.title("Training Curve")
+    plt.xlabel("Iteration")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.show()
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -147,7 +156,22 @@ def main():
     # TODO:                                                             #
     # Implement part (c)                                                #
     #####################################################################
-    pass
+    valid_acc = evaluate(val_data, theta, beta)
+    test_acc = evaluate(test_data, theta, beta)
+    print("Validation Accuracy:", valid_acc)
+    print("Test Accuracy:", test_acc)
+    
+    # part (d)
+    for i in range(5):
+        beta_curr = beta[i]
+        theta_curr = np.sort(theta)
+        prob_correct = np.exp(-np.logaddexp(0, beta_curr - theta_curr))
+        plt.plot(theta_curr, prob_correct, label="j = " + str(i))
+    plt.title("Probability of Correct Respose vs. Theta")
+    plt.ylabel("Probability")
+    plt.xlabel("Theta")
+    plt.legend()
+    plt.show()
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
