@@ -1,6 +1,7 @@
 import sys
 sys.path.append('../')
 
+# from knn import *
 from utils import *
 import torch
 from torch.autograd import Variable
@@ -193,8 +194,8 @@ def main():
 
     questions_num = train_matrix.shape[1]
 
-    i = 1
-    lamb_index = 0
+    i = 2
+    lamb_index = 2
 
     k = [10, 50, 100, 200, 500]
     
