@@ -76,7 +76,7 @@ class AutoEncoder(nn.Module):
         # Use sigmoid activations for f and g.                              #
         #####################################################################
         out = self.g(inputs)
-        out = F.sigmoid(out)
+        out = F.relu(out)
         out = self.h(out)
         out = F.sigmoid(out)
         #####################################################################
@@ -108,10 +108,12 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
     optimizer = optim.SGD(model.parameters(), lr=lr)
     num_student = train_data.shape[0]
 
+    print( train_data.shape)
+
     cost = []
     accValid = []
     accTrain = []
-
+    lossValid = []
 
     for epoch in range(0, num_epoch):
         train_loss = 0.
@@ -141,16 +143,18 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
         reg = lamb/2 *model.get_weight_norm()
         train_loss += reg
 
-        valid_acc = evaluate(model, zero_train_data, valid_data)
+        valid_acc, valid_loss = evaluate(model, zero_train_data, valid_data)
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
-              "Valid Acc: {}".format(epoch, train_loss, valid_acc))
+              "Valid Acc: {} \t "
+              "Valid Cost: {}".format(epoch, train_loss, valid_acc, valid_loss))
         # train_acc = evaluate(model, zero_train_data, train_data)
 
         cost.append(train_loss)
         accValid.append(valid_acc)
+        lossValid.append(valid_loss)
         # accTrain.append(train_acc)
 
-    return cost, accValid
+    return cost, accValid, lossValid
     #####################################################################
     #                       END OF YOUR CODE                            #
     #####################################################################
@@ -170,16 +174,21 @@ def evaluate(model, train_data, valid_data):
 
     total = 0
     correct = 0
+    loss = 0
+    
 
     for i, u in enumerate(valid_data["user_id"]):
         inputs = Variable(train_data[u]).unsqueeze(0)
         output = model(inputs)
 
+        prob = output[0][valid_data["question_id"][i]]
+        target = valid_data["is_correct"][i]
         guess = output[0][valid_data["question_id"][i]].item() >= 0.5
         if guess == valid_data["is_correct"][i]:
             correct += 1
         total += 1
-    return correct / float(total)
+        loss += torch.sum((target - prob) ** 2.).item()
+    return correct / float(total), loss
 
 
 def main():
@@ -194,14 +203,17 @@ def main():
 
     questions_num = train_matrix.shape[1]
 
-    i = 2
+    # print(zero_train_matrix)
+    # print(train_matrix)
+
+    i = 1
     lamb_index = 2
 
     k = [10, 50, 100, 200, 500]
     
     # Set optimization hyperparameters.
-    lr = [0.05, 0.05, 0.05, 0.05, 0.08]
-    num_epoch = [10, 8, 8, 7, 6]
+    lr = [0.05, 0.1, 0.05, 0.05, 0.08]
+    num_epoch = [10, 15, 10, 7, 6]
     lamb = [0, 0.001, 0.01, 0.1, 1]
     # for i in range(len(k)):
     model = AutoEncoder(questions_num, k[i])
@@ -213,15 +225,21 @@ def main():
 
     epochs = np.arange(num_epoch[i])
 
-    fig, ax = plt.subplots(1, 2)
+    fig, ax = plt.subplots(1, 3)
     ax[0].plot(epochs, res[0])  
     ax[0].set_xlabel("Epoch")  
-    ax[0].set_ylabel("Acc")  
+    ax[0].set_ylabel("loss")  
     ax[0].set_title("Training Loss per Epoch")
+
+    ax[1].plot(epochs, res[1])  
     ax[1].set_xlabel("Epoch")  
-    ax[1].set_ylabel("Loss")  
+    ax[1].set_ylabel("loss")  
     ax[1].set_title("Validation Accuracy per Epoch")
-    ax[1].plot(epochs, res[1])
+
+    ax[2].set_xlabel("Epoch")  
+    ax[2].set_ylabel("Loss")  
+    ax[2].set_title("Validation Loss per Epoch")
+    ax[2].plot(epochs, res[2])
     plt.show()
 
     #####################################################################
