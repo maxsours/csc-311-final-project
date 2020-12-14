@@ -264,25 +264,44 @@ def main(num_epoch, batch_size, lr):
 
     epochs = np.arange(num_epoch)
 
-    fig, ax = plt.subplots(1, 3)
-    ax[0].plot(epochs, res[0])  
-    ax[0].set_xlabel("Epoch")  
-    ax[0].set_ylabel("loss")  
-    ax[0].set_title("Training Loss per Epoch")
-
-    ax[1].plot(epochs, res[1])  
-    ax[1].set_xlabel("Epoch")  
-    ax[1].set_ylabel("loss")  
-    ax[1].set_title("Validation Accuracy per Epoch")
-
-    ax[2].set_xlabel("Epoch")  
-    ax[2].set_ylabel("Loss")  
-    ax[2].set_title("Validation Loss per Epoch")
-    ax[2].plot(epochs, res[2])
+    # fig, ax = plt.subplots(1, 3)
+    # ax[0].plot(epochs, res[0])
+    # ax[0].set_xlabel("Epoch")
+    # ax[0].set_ylabel("loss")
+    # ax[0].set_title("Training Loss per Epoch")
+    plt.title("Training Loss per Epoch")
+    plt.plot(epochs, res[0], label="Training Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("loss")
+    plt.legend(loc='best')
     plt.show()
 
+    plt.title("Validation Accuracy per Epoch")
+    plt.plot(epochs, res[1], label="validation Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("loss")
+    plt.legend(loc='best')
+    plt.show()
+
+    plt.title("Validation Loss per Epoch")
+    plt.plot(epochs, res[2], label="validation Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("loss")
+    plt.legend(loc='best')
+    plt.show()
+    # ax[1].plot(epochs, res[1])
+    # ax[1].set_xlabel("Epoch")
+    # ax[1].set_ylabel("loss")
+    # ax[1].set_title("Validation Accuracy per Epoch")
+    #
+    # ax[2].set_xlabel("Epoch")
+    # ax[2].set_ylabel("Loss")
+    # ax[2].set_title("Validation Loss per Epoch")
+    # ax[2].plot(epochs, res[2])
+    # plt.show()
+
 if __name__ == "__main__":
-    epoch = 120
+    epoch = 110
     batch_size = 128
     lr = 0.01
     main(epoch, batch_size, lr)
