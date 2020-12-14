@@ -37,9 +37,6 @@ def sample_with_replacement(data, num_samples):
         # counter += 1
     return np.array(result), np.array(weights)
 
-def sample():
-    result = {}
-
 def bag_data(data, num_samples):
     # choosing data randomely with replacement
     # data_size = data.shape
@@ -63,8 +60,8 @@ def main():
     val_data = load_valid_csv("../data")
     test_data = load_public_test_csv("../data")
     bag1, bag2, bag3, weights1, weights2, weights3 = bag_data(sparse_matrix, len(sparse_matrix))
-    print(val_data["user_id"])
-    print(bag1.shape, bag2.shape, bag3.shape)
+
+
     k = 6
     print("Training KNN k = ", k)
     nbrs = KNNImputer(n_neighbors=k)

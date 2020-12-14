@@ -1,4 +1,6 @@
 import sys
+from random import randint
+
 sys.path.append('../')
 
 from utils import *
@@ -167,6 +169,13 @@ def load_student_meta_csv(path):
             except IndexError:
                 # is_correct might not be available.
                 pass
+    d = data["gender"]
+    for i in range(len(d)):
+        if d[i] == 0:
+            r = randint(1, 2)
+            d[i] = r
+    data["gender"] = d
+    print(data["gender"])
     return data
 
 def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, batch_size=50):
@@ -273,7 +282,7 @@ def main(num_epoch, batch_size, lr):
     plt.show()
 
 if __name__ == "__main__":
-    epoch = 40
+    epoch = 120
     batch_size = 128
-    lr = 0.04
+    lr = 0.01
     main(epoch, batch_size, lr)
