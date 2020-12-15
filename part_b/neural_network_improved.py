@@ -175,7 +175,6 @@ def load_student_meta_csv(path):
             r = randint(1, 2)
             d[i] = r
     data["gender"] = d
-    print(data["gender"])
     return data
 
 def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, batch_size=50):
@@ -197,8 +196,6 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch, b
     # Define optimizers and loss function.
     optimizer = optim.SGD(model.parameters(), lr=lr)
     num_student = train_data.shape[0]
-
-    # print( train_data.shape)
 
     train_data_load = Dataset(train_data, zero_train_data)
 
