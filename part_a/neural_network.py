@@ -76,7 +76,7 @@ class AutoEncoder(nn.Module):
         # Use sigmoid activations for f and g.                              #
         #####################################################################
         out = self.g(inputs)
-        out = F.relu(out)
+        out = F.sigmoid(out)
         out = self.h(out)
         out = F.sigmoid(out)
         #####################################################################
@@ -125,10 +125,7 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
             # FORWARD PASS
             optimizer.zero_grad()
             output = model(inputs)
-
-            # print(model.layers[0].shape)
-            # print(model.layers[1].shape)
-
+            
             # Mask the target to only compute the gradient of valid entries.
             nan_mask = np.isnan(train_data[user_id].unsqueeze(0).numpy())
             target[0][nan_mask] = output[0][nan_mask]
@@ -147,12 +144,10 @@ def train(model, lr, lamb, train_data, zero_train_data, valid_data, num_epoch):
         print("Epoch: {} \tTraining Cost: {:.6f}\t "
               "Valid Acc: {} \t "
               "Valid Cost: {}".format(epoch, train_loss, valid_acc, valid_loss))
-        # train_acc = evaluate(model, zero_train_data, train_data)
 
         cost.append(train_loss)
         accValid.append(valid_acc)
         lossValid.append(valid_loss)
-        # accTrain.append(train_acc)
 
     return cost, accValid, lossValid
     #####################################################################
@@ -202,18 +197,14 @@ def main():
     # Set model hyperparameters.
 
     questions_num = train_matrix.shape[1]
-
-    # print(zero_train_matrix)
-    # print(train_matrix)
-
     i = 1
     lamb_index = 2
 
     k = [10, 50, 100, 200, 500]
     
     # Set optimization hyperparameters.
-    lr = [0.05, 0.1, 0.05, 0.05, 0.08]
-    num_epoch = [10, 15, 10, 7, 6]
+    lr = [0.05, 0.05, 0.05, 0.05, 0.08]
+    num_epoch = [10, 8, 8, 7, 6]
     lamb = [0, 0.001, 0.01, 0.1, 1]
     # for i in range(len(k)):
     model = AutoEncoder(questions_num, k[i])
